@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Captchas</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@forevolve/bootstrap-dark@1.0.0/dist/css/toggle-bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@forevolve/bootstrap-dark@1.0.0/dist/css/toggle-bootstrap-dark.min.css"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body class="bootstrap">
+    <div class="container">
+      <h1>Captchas</h1>
+      <div id="alert"></div>
+      <div id="questions"></div>
+      <div id="submit"></div>
+    </div>
+  </body>
+  <script>
+    window.Telegram.WebApp.ready();
+
+    // setup theme
+    let checkThemeFunc = () => {
+      let body = document.querySelector("body");
+      if (window.Telegram.WebApp.colorScheme == "dark") {
+        body.classList.remove("bootstrap");
+        body.classList.add("bootstrap-dark");
+      } else {
+        body.classList.remove("bootstrap-dark");
+        body.classList.add("bootstrap");
+      }
+    };
+    checkThemeFunc();
+
+    Telegram.WebApp.onEvent("themeChanged", () => {
+      checkThemeFunc();
+    });
+
+    let submitFunc = (ids) => {
+      let answers = [];
+      for (let id of ids) {
+        answers.push({
+          id: id,
+          answer: document.getElementById("question" + id).value,
+        });
+      }
+      let body = {
+        init_data: Telegram.WebApp.initData,
+        answers: answers,
+      };
+      fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      })
+        .then((response) => response.json())
+        .then((json) => {
+          window.Telegram.WebApp.close();
+        });
+    };
+
+    let validateData = {
+      init_data: Telegram.WebApp.initData,
+    };
+
+    fetch("/api/validate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(validateData),
+    })
+      .then((response) => response.json())
+      .then((json) => {
+        if (json.status) {
+          let ids = [];
+          for (let i = 0; i < json.questions.length; i++) {
+            let inputGroup = document.createElement("div");
+            inputGroup.classList.add("input-group");
+            inputGroup.classList.add("mb-3");
+
+            let span = document.createElement("span");
+            span.classList.add("input-group-text");
+            span.id = "answer" + json.questions[i].id;
+            span.textContent = "Answer";
+
+            inputGroup.appendChild(span);
+
+            let input = document.createElement("input");
+            input.type = "text";
+            input.classList.add("form-control");
+            input.id = "question" + json.questions[i].id;
+
+            ids.push(json.questions[i].id);
+
+            inputGroup.appendChild(input);
+
+            let question = document.createElement("div");
+
+            let label = document.createElement("label");
+            label.classList.add("form-label");
+            label.textContent = json.questions[i].question;
+
+            question.appendChild(label);
+            question.appendChild(inputGroup);
+
+            document.querySelector("#questions").appendChild(question);
+          }
+
+          let submit = document.createElement("button");
+          submit.type = "button";
+          submit.classList.add("btn");
+          submit.classList.add("btn-primary");
+          submit.textContent = "Submit";
+
+          submit.onclick = (e) => {
+            submit.disabled = true;
+            submitFunc(ids);
+          };
+
+          document.querySelector("#submit").appendChild(submit);
+        } else {
+          let alert = document.createElement("div");
+          alert.classList.add("alert");
+          alert.classList.add("alert-danger");
+          alert.setAttribute("role", "alert");
+          alert.textContent = json.message;
+
+          document.querySelector("#alert").appendChild(alert);
+        }
+      });
+  </script>
+</html>
