@@ -31,6 +31,11 @@ func (cb *CaptchasBot) timeoutBan(chatId, userId, msgId int64) func() {
 
 func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) error {
 	log.Println("ChatJoinRequest", ctx.EffectiveChat.Id, ctx.EffectiveUser.Id)
+
+	if _, ok := cb.statusMap[ctx.EffectiveUser.Id]; ok {
+		return nil
+	}
+
 	text := strings.Replace(cb.config.Messages.AskQuestion, `{chat_title}`, ctx.EffectiveChat.Title, -1)
 	msg, err := b.SendMessage(ctx.EffectiveUser.Id, text, &gotgbot.SendMessageOpts{
 		ProtectContent: true,
