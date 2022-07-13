@@ -7,8 +7,9 @@ import (
 )
 
 type Status struct {
+	title     string
 	chatId    int64
-	msgId int64
+	msgId     int64
 	startTime int64
 	timer     *time.Timer
 }
@@ -38,6 +39,7 @@ type CommonResponse struct {
 }
 
 type ValidateResponse struct {
+	Title     string             `json:"title"`
 	Questions []QuestionResponse `json:"questions"`
 	CommonResponse
 }

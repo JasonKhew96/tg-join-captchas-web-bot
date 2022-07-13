@@ -49,6 +49,7 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 		return err
 	}
 	cb.statusMap[ctx.EffectiveUser.Id] = &Status{
+		title:     ctx.EffectiveChat.Title,
 		chatId:    ctx.EffectiveChat.Id,
 		msgId:     msg.MessageId,
 		startTime: time.Now().Unix(),

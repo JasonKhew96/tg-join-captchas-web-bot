@@ -21,7 +21,7 @@
   </head>
   <body class="bootstrap">
     <div class="container">
-      <h1>Captchas</h1>
+      <h1 id="title">Captchas</h1>
       <div id="alert"></div>
       <div id="questions"></div>
       <div id="submit"></div>
@@ -86,6 +86,9 @@
       .then((response) => response.json())
       .then((json) => {
         if (json.status) {
+          document.getElementsByTagName("title").textContent = json.title;
+          document.getElementById("title").textContent = json.title;
+
           let ids = [];
           for (let i = 0; i < json.questions.length; i++) {
             let inputGroup = document.createElement("div");

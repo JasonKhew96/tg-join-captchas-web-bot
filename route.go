@@ -65,6 +65,7 @@ func (cb *CaptchasBot) validate(w http.ResponseWriter, r *http.Request) {
 				})
 			}
 			if respData, err := json.Marshal(ValidateResponse{
+				Title:          userStatus.title,
 				Questions:      questions,
 				CommonResponse: CommonResponse{Status: true, Message: "validation succeeded"},
 			}); err != nil {
