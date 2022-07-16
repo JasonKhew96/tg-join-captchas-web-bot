@@ -31,6 +31,7 @@ type Config struct {
 	BanTime      int64  `yaml:"ban_time"`
 	Timeout      int64  `yaml:"timeout"`
 	CustomDomain string `yaml:"custom_domain"`
+	DefaultLang  string `yaml:"default_lang"`
 	Messages     map[string]Message
 	Chats        []Chat `yaml:"chats"`
 }
@@ -65,7 +66,7 @@ func loadConfig() (*Config, error) {
 func (c *Config) getMessages(lang string) Message {
 	messages, ok := c.Messages[lang]
 	if !ok {
-		return c.Messages["en"]
+		return c.Messages[c.DefaultLang]
 	}
 	return messages
 }
