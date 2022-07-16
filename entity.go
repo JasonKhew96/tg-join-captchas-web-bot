@@ -8,6 +8,7 @@ import (
 
 type Status struct {
 	title     string
+	lang      string
 	chatId    int64
 	msgId     int64
 	startTime int64

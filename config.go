@@ -18,19 +18,21 @@ type Chat struct {
 	Questions []Question `yaml:"questions"`
 }
 
+type Message struct {
+	AskQuestionButton string `yaml:"ask_question_button"`
+	AskQuestion       string `yaml:"ask_question"`
+	TimeoutError      string `yaml:"timeout_error"`
+	CorrectAnswer     string `yaml:"correct_answer"`
+	WrongAnswer       string `yaml:"wrong_answer"`
+}
+
 type Config struct {
 	BotToken     string `yaml:"bot_token"`
 	BanTime      int64  `yaml:"ban_time"`
 	Timeout      int64  `yaml:"timeout"`
 	CustomDomain string `yaml:"custom_domain"`
-	Messages     struct {
-		AskQuestionButton string `yaml:"ask_question_button"`
-		AskQuestion       string `yaml:"ask_question"`
-		TimeoutError      string `yaml:"timeout_error"`
-		CorrectAnswer     string `yaml:"correct_answer"`
-		WrongAnswer       string `yaml:"wrong_answer"`
-	} `yaml:"messages"`
-	Chats []Chat `yaml:"chats"`
+	Messages     map[string]Message
+	Chats        []Chat `yaml:"chats"`
 }
 
 func loadConfig() (*Config, error) {
@@ -41,10 +43,29 @@ func loadConfig() (*Config, error) {
 		return nil, err
 	}
 
-	err = yaml.Unmarshal([]byte(data), &c)
+	if err := yaml.Unmarshal([]byte(data), &c); err != nil {
+		return nil, err
+	}
+
+	data, err = ioutil.ReadFile("languages.yaml")
 	if err != nil {
 		return nil, err
 	}
 
+	var languages map[string]Message
+	if err := yaml.Unmarshal([]byte(data), &languages); err != nil {
+		return nil, err
+	}
+
+	c.Messages = languages
+
 	return &c, nil
+}
+
+func (c *Config) getMessages(lang string) Message {
+	messages, ok := c.Messages[lang]
+	if !ok {
+		return c.Messages["en"]
+	}
+	return messages
 }

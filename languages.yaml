@@ -1,0 +1,18 @@
+en:
+  ask_question_button: "Verify"
+  ask_question: "You need to answer some question(s) before joining {chat_title} group"
+  timeout_error: "Timeout, please try to join again later"
+  correct_answer: "All questions answered correctly, you are approved and invited into group"
+  wrong_answer: "Wrong answer, please try to join again later"
+zh-hans:
+  ask_question_button: "验证"
+  ask_question: "请完成以下 验证，回答正确 会 自动批准进 {chat_title} 群"
+  timeout_error: "验证超时，请稍候重试"
+  correct_answer: "回答正确，已批准进群"
+  wrong_answer: "回答錯誤，請稍候重試"
+zh-hant:
+  ask_question_button: "驗證"
+  ask_question: "請完成以下 驗證，回答正確 會 自動批准進 {chat_title} 群"
+  timeout_error: "驗證超時，請稍後重試"
+  correct_answer: "回答正確，已批准進群"
+  wrong_answer: "回答錯誤，請稍候重試"

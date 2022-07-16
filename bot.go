@@ -15,10 +15,11 @@ func (cb *CaptchasBot) isValidChat(cjr *gotgbot.ChatJoinRequest) bool {
 	return chat != nil
 }
 
-func (cb *CaptchasBot) timeoutBan(chatId, userId, msgId int64) func() {
+func (cb *CaptchasBot) timeoutBan(chatId, userId, msgId int64, lang string) func() {
+	messages := cb.config.getMessages(lang)
 	return func() {
 		log.Println("timeout for user", chatId, userId, "message", msgId)
-		if _, ok, err := cb.b.EditMessageText(cb.config.Messages.TimeoutError, &gotgbot.EditMessageTextOpts{
+		if _, ok, err := cb.b.EditMessageText(messages.TimeoutError, &gotgbot.EditMessageTextOpts{
 			ChatId:      userId,
 			MessageId:   msgId,
 			ReplyMarkup: gotgbot.InlineKeyboardMarkup{},
@@ -36,13 +37,15 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 		return nil
 	}
 
-	text := strings.Replace(cb.config.Messages.AskQuestion, `{chat_title}`, ctx.EffectiveChat.Title, -1)
+	messages := cb.config.getMessages(ctx.EffectiveUser.LanguageCode)
+
+	text := strings.Replace(messages.AskQuestion, `{chat_title}`, ctx.EffectiveChat.Title, -1)
 	msg, err := b.SendMessage(ctx.EffectiveUser.Id, text, &gotgbot.SendMessageOpts{
 		ProtectContent: true,
 		ReplyMarkup: gotgbot.InlineKeyboardMarkup{
 			InlineKeyboard: [][]gotgbot.InlineKeyboardButton{
 				{gotgbot.InlineKeyboardButton{
-					Text: cb.config.Messages.AskQuestionButton,
+					Text: messages.AskQuestionButton,
 					WebApp: &gotgbot.WebAppInfo{
 						Url: fmt.Sprintf("https://%s", cb.config.CustomDomain),
 					},
@@ -55,10 +58,11 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 	}
 	cb.statusMap[ctx.EffectiveUser.Id] = &Status{
 		title:     ctx.EffectiveChat.Title,
+		lang:      ctx.EffectiveUser.LanguageCode,
 		chatId:    ctx.EffectiveChat.Id,
 		msgId:     msg.MessageId,
 		startTime: time.Now().Unix(),
-		timer:     time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutBan(ctx.EffectiveChat.Id, ctx.EffectiveUser.Id, msg.MessageId)),
+		timer:     time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutBan(ctx.EffectiveChat.Id, ctx.EffectiveUser.Id, msg.MessageId, ctx.EffectiveUser.LanguageCode)),
 	}
 	return nil
 }

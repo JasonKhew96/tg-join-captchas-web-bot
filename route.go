@@ -153,8 +153,9 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 			} else {
 				w.Write(respData)
 			}
+			messages := cb.config.getMessages(userStatus.lang)
 			if correct {
-				if _, ok, err := cb.b.EditMessageText(cb.config.Messages.CorrectAnswer, &gotgbot.EditMessageTextOpts{
+				if _, ok, err := cb.b.EditMessageText(messages.CorrectAnswer, &gotgbot.EditMessageTextOpts{
 					ChatId:      user.Id,
 					MessageId:   userStatus.msgId,
 					ReplyMarkup: gotgbot.InlineKeyboardMarkup{},
@@ -163,7 +164,7 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 				}
 				cb.deleteStatusAndApprove(userStatus.chatId, user.Id)
 			} else {
-				if _, ok, err := cb.b.EditMessageText(cb.config.Messages.WrongAnswer, &gotgbot.EditMessageTextOpts{
+				if _, ok, err := cb.b.EditMessageText(messages.WrongAnswer, &gotgbot.EditMessageTextOpts{
 					ChatId:      user.Id,
 					MessageId:   userStatus.msgId,
 					ReplyMarkup: gotgbot.InlineKeyboardMarkup{},
