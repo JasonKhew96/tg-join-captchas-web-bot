@@ -68,7 +68,9 @@ func (cb *CaptchasBot) deleteStatusAndApprove(chatId, userId int64) {
 }
 
 func (cb *CaptchasBot) stopStatusTimer(status *Status) {
-	if !status.timer.Stop() {
-		<-status.timer.C
+	status.timer.Stop()
+	select {
+	case <-status.timer.C:
+	default:
 	}
 }
