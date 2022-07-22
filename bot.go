@@ -31,16 +31,16 @@ func (cb *CaptchasBot) timeoutBan(chatId, userId, msgId int64, lang string) func
 }
 
 func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) error {
-	log.Println("ChatJoinRequest", ctx.EffectiveChat.Id, ctx.EffectiveUser.Id)
+	log.Println("ChatJoinRequest", ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id)
 
-	if _, ok := cb.statusMap[ctx.EffectiveUser.Id]; ok {
+	if _, ok := cb.statusMap[ctx.EffectiveSender.User.Id]; ok {
 		return nil
 	}
 
-	messages := cb.config.getMessages(ctx.EffectiveUser.LanguageCode)
+	messages := cb.config.getMessages(ctx.EffectiveSender.User.LanguageCode)
 
 	text := strings.Replace(messages.AskQuestion, `{chat_title}`, ctx.EffectiveChat.Title, -1)
-	msg, err := b.SendMessage(ctx.EffectiveUser.Id, text, &gotgbot.SendMessageOpts{
+	msg, err := b.SendMessage(ctx.EffectiveSender.User.Id, text, &gotgbot.SendMessageOpts{
 		ProtectContent: true,
 		ReplyMarkup: gotgbot.InlineKeyboardMarkup{
 			InlineKeyboard: [][]gotgbot.InlineKeyboardButton{
@@ -56,13 +56,14 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 	if err != nil {
 		return err
 	}
-	cb.statusMap[ctx.EffectiveUser.Id] = &Status{
+
+	cb.statusMap[ctx.EffectiveSender.User.Id] = &Status{
 		title:     ctx.EffectiveChat.Title,
-		lang:      ctx.EffectiveUser.LanguageCode,
+		lang:      ctx.EffectiveSender.User.LanguageCode,
 		chatId:    ctx.EffectiveChat.Id,
 		msgId:     msg.MessageId,
 		startTime: time.Now().Unix(),
-		timer:     time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutBan(ctx.EffectiveChat.Id, ctx.EffectiveUser.Id, msg.MessageId, ctx.EffectiveUser.LanguageCode)),
+		timer:     time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutBan(ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id, msg.MessageId, ctx.EffectiveSender.User.LanguageCode)),
 	}
 	return nil
 }
