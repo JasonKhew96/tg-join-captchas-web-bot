@@ -7,9 +7,8 @@ import (
 )
 
 type Status struct {
-	title     string
-	lang      string
-	chatId    int64
+	chat      *gotgbot.Chat
+	user      *gotgbot.User
 	msgId     int64
 	startTime int64
 	timer     *time.Timer
@@ -26,12 +25,14 @@ type CommonInitData struct {
 	InitData string `json:"init_data"`
 }
 
+type Answer struct {
+	Id     int    `json:"id"`
+	Answer string `json:"answer"`
+}
+
 type SubmitData struct {
 	CommonInitData
-	Answers []struct {
-		Id     int    `json:"id"`
-		Answer string `json:"answer"`
-	} `json:"answers"`
+	Answers []Answer `json:"answers"`
 }
 
 type CommonResponse struct {
@@ -57,4 +58,12 @@ type User struct {
 	LastName     string `json:"last_name"`
 	Username     string `json:"username"`
 	LanguageCode string `json:"language_code"`
+}
+
+type BuildLogStringParam struct {
+	logType LogType
+	chat    *gotgbot.Chat
+	user    *gotgbot.User
+	userBio string
+	answers []Answer
 }

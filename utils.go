@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/PaulSonOfLars/gotgbot/v2"
@@ -74,3 +75,43 @@ func (cb *CaptchasBot) stopStatusTimer(status *Status) {
 	default:
 	}
 }
+
+func buildLogString(param *BuildLogStringParam) string {
+	var logString string
+	logString += fmt.Sprintf(LogFormatHeader, param.logType.String())
+	logString += fmt.Sprintf(LogFormatChat, EscapeMarkdownV2(param.chat.Title), param.chat.Id)
+	logString += fmt.Sprintf(LogFormatUser, EscapeMarkdownV2(strings.Join([]string{param.user.FirstName, param.user.LastName}, " ")), param.user.Id, param.user.Id)
+	if param.user.Username != "" {
+		logString += fmt.Sprintf(LogFormatUsername, param.user.Username)
+	}
+	if param.userBio != "" {
+		logString += fmt.Sprintf(LogFormatBio, param.userBio)
+	}
+	if param.user.LanguageCode != "" {
+		logString += fmt.Sprintf(LogFormatLanguage, param.user.LanguageCode)
+	}
+	if param.user.IsPremium {
+		logString += fmt.Sprintf(LogFormatPremium, param.user.IsPremium)
+	}
+	if len(param.answers) > 0 {
+		var data string
+		for _, answer := range param.answers {
+			data += fmt.Sprintf(LogFormatAnswer, answer.Id, EscapeMarkdownV2(answer.Answer))
+		}
+		logString += fmt.Sprintf(LogFormatData, data)
+	}
+	return logString
+}
+
+var allMdV2 = []string{"_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"}
+var mdV2Repl = strings.NewReplacer(func() (out []string) {
+	for _, x := range allMdV2 {
+		out = append(out, x, "\\"+x)
+	}
+	return out
+}()...)
+
+func EscapeMarkdownV2(s string) string {
+	return mdV2Repl.Replace(s)
+}
+

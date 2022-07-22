@@ -15,18 +15,28 @@ func (cb *CaptchasBot) isValidChat(cjr *gotgbot.ChatJoinRequest) bool {
 	return chat != nil
 }
 
-func (cb *CaptchasBot) timeoutBan(chatId, userId, msgId int64, lang string) func() {
-	messages := cb.config.getMessages(lang)
+func (cb *CaptchasBot) timeoutBan(msgId int64, chat *gotgbot.Chat, user *gotgbot.User) func() {
+	messages := cb.config.getMessages(user.LanguageCode)
 	return func() {
-		log.Println("timeout for user", chatId, userId, "message", msgId)
+		log.Println("timeout for user", chat.Id, user.Id, "message", msgId)
 		if _, ok, err := cb.b.EditMessageText(messages.TimeoutError, &gotgbot.EditMessageTextOpts{
-			ChatId:      userId,
+			ChatId:      user.Id,
 			MessageId:   msgId,
 			ReplyMarkup: gotgbot.InlineKeyboardMarkup{},
 		}); err != nil || !ok {
 			log.Println("failed to edit message:", ok, err)
 		}
-		cb.deleteStatusAndDecline(chatId, userId)
+
+		if _, err := cb.b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
+			logType: LogTypeTimeout,
+			chat:    chat,
+			user:    user,
+		}), &gotgbot.SendMessageOpts{
+			ParseMode: "MarkdownV2",
+		}); err != nil {
+			log.Println("failed to send log message:", err)
+		}
+		cb.deleteStatusAndDecline(chat.Id, user.Id)
 	}
 }
 
@@ -57,13 +67,23 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 		return err
 	}
 
+	if _, err := b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
+		logType: LogTypeRequested,
+		chat:    ctx.EffectiveChat,
+		user:    ctx.EffectiveSender.User,
+		userBio: ctx.ChatJoinRequest.Bio,
+	}), &gotgbot.SendMessageOpts{
+		ParseMode: "MarkdownV2",
+	}); err != nil {
+		log.Println("failed to send log message:", err)
+	}
+
 	cb.statusMap[ctx.EffectiveSender.User.Id] = &Status{
-		title:     ctx.EffectiveChat.Title,
-		lang:      ctx.EffectiveSender.User.LanguageCode,
-		chatId:    ctx.EffectiveChat.Id,
+		chat:      ctx.EffectiveChat,
+		user:      ctx.EffectiveSender.User,
 		msgId:     msg.MessageId,
 		startTime: time.Now().Unix(),
-		timer:     time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutBan(ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id, msg.MessageId, ctx.EffectiveSender.User.LanguageCode)),
+		timer:     time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutBan(msg.MessageId, ctx.EffectiveChat, ctx.EffectiveSender.User)),
 	}
 	return nil
 }

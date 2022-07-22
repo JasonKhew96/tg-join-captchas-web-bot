@@ -53,9 +53,9 @@ func (cb *CaptchasBot) validate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		chat := cb.getChatConfig(userStatus.chatId)
+		chat := cb.getChatConfig(userStatus.chat.Id)
 
-		if chat.ChatId == userStatus.chatId {
+		if chat.ChatId == userStatus.chat.Id {
 			var questions []QuestionResponse
 			for _, question := range chat.Questions {
 				questions = append(questions, QuestionResponse{
@@ -65,7 +65,7 @@ func (cb *CaptchasBot) validate(w http.ResponseWriter, r *http.Request) {
 				})
 			}
 			if respData, err := json.Marshal(ValidateResponse{
-				Title:          userStatus.title,
+				Title:          userStatus.chat.Title,
 				Questions:      questions,
 				CommonResponse: CommonResponse{Status: true, Message: "validation succeeded"},
 			}); err != nil {
@@ -122,7 +122,7 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		chat := cb.getChatConfig(userStatus.chatId)
+		chat := cb.getChatConfig(userStatus.chat.Id)
 		if chat == nil {
 			writeJson(w, false, "validation failed")
 			return
@@ -130,7 +130,7 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 
 		log.Println(chat.ChatId, user.Id, data.Answers)
 
-		if chat.ChatId == userStatus.chatId {
+		if chat.ChatId == userStatus.chat.Id {
 			correct := true
 			for _, userAnswer := range data.Answers {
 				for _, q := range chat.Questions {
@@ -153,7 +153,7 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 			} else {
 				w.Write(respData)
 			}
-			messages := cb.config.getMessages(userStatus.lang)
+			messages := cb.config.getMessages(userStatus.user.LanguageCode)
 			if correct {
 				if _, ok, err := cb.b.EditMessageText(messages.CorrectAnswer, &gotgbot.EditMessageTextOpts{
 					ChatId:      user.Id,
@@ -162,7 +162,17 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 				}); err != nil || !ok {
 					log.Println("failed to edit message:", ok, err)
 				}
-				cb.deleteStatusAndApprove(userStatus.chatId, user.Id)
+				if _, err := cb.b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
+					logType: LogTypeApproved,
+					chat:    userStatus.chat,
+					user:    userStatus.user,
+					answers: data.Answers,
+				}), &gotgbot.SendMessageOpts{
+					ParseMode: "MarkdownV2",
+				}); err != nil {
+					log.Println("failed to send log message:", err)
+				}
+				cb.deleteStatusAndApprove(userStatus.chat.Id, user.Id)
 			} else {
 				if _, ok, err := cb.b.EditMessageText(messages.WrongAnswer, &gotgbot.EditMessageTextOpts{
 					ChatId:      user.Id,
@@ -171,7 +181,17 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 				}); err != nil || !ok {
 					log.Println("failed to edit message:", ok, err)
 				}
-				cb.deleteStatusAndDecline(userStatus.chatId, user.Id)
+				if _, err := cb.b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
+					logType: LogTypeWrong,
+					chat:    userStatus.chat,
+					user:    userStatus.user,
+					answers: data.Answers,
+				}), &gotgbot.SendMessageOpts{
+					ParseMode: "MarkdownV2",
+				}); err != nil {
+					log.Println("failed to send log message:", err)
+				}
+				cb.deleteStatusAndDecline(userStatus.chat.Id, user.Id)
 			}
 			return
 		}

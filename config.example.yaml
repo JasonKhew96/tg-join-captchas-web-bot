@@ -1,6 +1,7 @@
 bot_token: 2147483647:c588c0a459f4ccc6f3dd26518d24707a
 ban_time: 300
 timeout: 300
+log_chat_id: -1002147483647
 custom_domain: www.example.com
 default_lang: zh-hans
 chats:

@@ -30,6 +30,7 @@ type Config struct {
 	BotToken     string `yaml:"bot_token"`
 	BanTime      int64  `yaml:"ban_time"`
 	Timeout      int64  `yaml:"timeout"`
+	LogChatId    int64  `yaml:"log_chat_id"`
 	CustomDomain string `yaml:"custom_domain"`
 	DefaultLang  string `yaml:"default_lang"`
 	Messages     map[string]Message
