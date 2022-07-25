@@ -82,10 +82,10 @@ func buildLogString(param *BuildLogStringParam) string {
 	logString += fmt.Sprintf(LogFormatChat, EscapeMarkdownV2(param.chat.Title), param.chat.Id)
 	logString += fmt.Sprintf(LogFormatUser, EscapeMarkdownV2(strings.Join([]string{param.user.FirstName, param.user.LastName}, " ")), param.user.Id, param.user.Id)
 	if param.user.Username != "" {
-		logString += fmt.Sprintf(LogFormatUsername, param.user.Username)
+		logString += fmt.Sprintf(LogFormatUsername, EscapeMarkdownV2(param.user.Username))
 	}
 	if param.userBio != "" {
-		logString += fmt.Sprintf(LogFormatBio, param.userBio)
+		logString += fmt.Sprintf(LogFormatBio, EscapeMarkdownV2(param.userBio))
 	}
 	if param.user.LanguageCode != "" {
 		logString += fmt.Sprintf(LogFormatLanguage, param.user.LanguageCode)
