@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -15,7 +15,7 @@ import (
 
 func (cb *CaptchasBot) validate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println("Read body error: ", err)
 		writeJson(w, false, "validation failed")
@@ -84,7 +84,7 @@ func (cb *CaptchasBot) validate(w http.ResponseWriter, r *http.Request) {
 
 func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println("Read body error: ", err)
 		writeJson(w, false, "validation failed")
@@ -209,7 +209,7 @@ func (cb *CaptchasBot) runServer(domain, port string) {
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 
-	log.Println(fmt.Sprintf("Listening on %s:%s...", domain, port))
+	log.Printf("Listening on %s:%s...", domain, port)
 	go func() {
 		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", port), nil)
 		if err != nil {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -40,7 +40,7 @@ type Config struct {
 func loadConfig() (*Config, error) {
 	c := Config{}
 
-	data, err := ioutil.ReadFile("config.yaml")
+	data, err := os.ReadFile("config.yaml")
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func loadConfig() (*Config, error) {
 		return nil, err
 	}
 
-	data, err = ioutil.ReadFile("languages.yaml")
+	data, err = os.ReadFile("languages.yaml")
 	if err != nil {
 		return nil, err
 	}

@@ -116,4 +116,3 @@ var mdV2Repl = strings.NewReplacer(func() (out []string) {
 func EscapeMarkdownV2(s string) string {
 	return mdV2Repl.Replace(s)
 }
-
