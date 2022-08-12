@@ -15,7 +15,7 @@ func (cb *CaptchasBot) isValidChat(cjr *gotgbot.ChatJoinRequest) bool {
 	return chat != nil
 }
 
-func (cb *CaptchasBot) timeoutBan(msgId int64, chat *gotgbot.Chat, user *gotgbot.User) func() {
+func (cb *CaptchasBot) timeoutKick(msgId int64, chat *gotgbot.Chat, user *gotgbot.User) func() {
 	messages := cb.config.getMessages(user.LanguageCode)
 	return func() {
 		log.Println("timeout for user", chat.Id, user.Id, "message", msgId)
@@ -36,7 +36,7 @@ func (cb *CaptchasBot) timeoutBan(msgId int64, chat *gotgbot.Chat, user *gotgbot
 		}); err != nil {
 			log.Println("failed to send log message:", err)
 		}
-		cb.deleteStatusAndDecline(chat.Id, user.Id)
+		cb.deleteStatusAndDecline(chat.Id, user.Id, false)
 	}
 }
 
@@ -83,7 +83,7 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 		user:      ctx.EffectiveSender.User,
 		msgId:     msg.MessageId,
 		startTime: time.Now().Unix(),
-		timer:     time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutBan(msg.MessageId, ctx.EffectiveChat, ctx.EffectiveSender.User)),
+		timer:     time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutKick(msg.MessageId, ctx.EffectiveChat, ctx.EffectiveSender.User)),
 	}
 	return nil
 }

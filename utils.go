@@ -40,16 +40,18 @@ func (cb *CaptchasBot) getChatConfig(chatId int64) *Chat {
 	return nil
 }
 
-func (cb *CaptchasBot) deleteStatusAndDecline(chatId, userId int64) {
+func (cb *CaptchasBot) deleteStatusAndDecline(chatId, userId int64, needBan bool) {
 	log.Println("Decline", chatId, userId)
 	if userStatus, ok := cb.statusMap[userId]; ok {
 		if _, err := cb.b.DeclineChatJoinRequest(chatId, userId, nil); err != nil {
 			log.Println("failed to decline chat join request:", err)
 		}
-		if _, err := cb.b.BanChatMember(chatId, userId, &gotgbot.BanChatMemberOpts{
-			UntilDate: time.Now().Unix() + cb.config.BanTime,
-		}); err != nil {
-			log.Println("failed to ban user:", err)
+		if needBan {
+			if _, err := cb.b.BanChatMember(chatId, userId, &gotgbot.BanChatMemberOpts{
+				UntilDate: time.Now().Unix() + cb.config.BanTime,
+			}); err != nil {
+				log.Println("failed to ban user:", err)
+			}
 		}
 		cb.stopStatusTimer(userStatus)
 		delete(cb.statusMap, userId)

@@ -191,7 +191,7 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 				}); err != nil {
 					log.Println("failed to send log message:", err)
 				}
-				cb.deleteStatusAndDecline(userStatus.chat.Id, user.Id)
+				cb.deleteStatusAndDecline(userStatus.chat.Id, user.Id, true)
 			}
 			return
 		}
