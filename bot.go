@@ -64,7 +64,7 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 		},
 	})
 	if err != nil {
-		return err
+		log.Printf("failed to send request message: %s", err)
 	}
 
 	if _, err := b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
