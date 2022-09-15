@@ -61,9 +61,10 @@ type User struct {
 }
 
 type BuildLogStringParam struct {
-	logType LogType
-	chat    *gotgbot.Chat
-	user    *gotgbot.User
-	userBio string
-	answers []Answer
+	logType   LogType
+	chat      *gotgbot.Chat
+	user      *gotgbot.User
+	userBio   string
+	isBlocked bool
+	answers   []Answer
 }

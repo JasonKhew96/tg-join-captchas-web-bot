@@ -95,6 +95,9 @@ func buildLogString(param *BuildLogStringParam) string {
 	if param.user.IsPremium {
 		logString += fmt.Sprintf(LogFormatPremium, param.user.IsPremium)
 	}
+	if param.isBlocked {
+		logString += fmt.Sprintf(LogFormatIsBlocked, param.isBlocked)
+	}
 	if len(param.answers) > 0 {
 		var data string
 		for _, answer := range param.answers {

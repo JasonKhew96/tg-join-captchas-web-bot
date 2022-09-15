@@ -19,12 +19,14 @@ func (cb *CaptchasBot) timeoutKick(msgId int64, chat *gotgbot.Chat, user *gotgbo
 	messages := cb.config.getMessages(user.LanguageCode)
 	return func() {
 		log.Println("timeout for user", chat.Id, user.Id, "message", msgId)
-		if _, ok, err := cb.b.EditMessageText(messages.TimeoutError, &gotgbot.EditMessageTextOpts{
-			ChatId:      user.Id,
-			MessageId:   msgId,
-			ReplyMarkup: gotgbot.InlineKeyboardMarkup{},
-		}); err != nil || !ok {
-			log.Println("failed to edit message:", ok, err)
+		if msgId != 0 {
+			if _, ok, err := cb.b.EditMessageText(messages.TimeoutError, &gotgbot.EditMessageTextOpts{
+				ChatId:      user.Id,
+				MessageId:   msgId,
+				ReplyMarkup: gotgbot.InlineKeyboardMarkup{},
+			}); err != nil || !ok {
+				log.Println("failed to edit message:", ok, err)
+			}
 		}
 
 		if _, err := cb.b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
@@ -68,22 +70,28 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 	}
 
 	if _, err := b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
-		logType: LogTypeRequested,
-		chat:    ctx.EffectiveChat,
-		user:    ctx.EffectiveSender.User,
-		userBio: ctx.ChatJoinRequest.Bio,
+		logType:   LogTypeRequested,
+		chat:      ctx.EffectiveChat,
+		user:      ctx.EffectiveSender.User,
+		userBio:   ctx.ChatJoinRequest.Bio,
+		isBlocked: err != nil,
 	}), &gotgbot.SendMessageOpts{
 		ParseMode: "MarkdownV2",
 	}); err != nil {
 		log.Println("failed to send log message:", err)
 	}
 
+	var msgId int64
+	if msg != nil {
+		msgId = msg.MessageId
+	}
+
 	cb.statusMap[ctx.EffectiveSender.User.Id] = &Status{
 		chat:      ctx.EffectiveChat,
 		user:      ctx.EffectiveSender.User,
-		msgId:     msg.MessageId,
+		msgId:     msgId,
 		startTime: time.Now().Unix(),
-		timer:     time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutKick(msg.MessageId, ctx.EffectiveChat, ctx.EffectiveSender.User)),
+		timer:     time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutKick(msgId, ctx.EffectiveChat, ctx.EffectiveSender.User)),
 	}
 	return nil
 }

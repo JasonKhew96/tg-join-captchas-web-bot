@@ -1,15 +1,16 @@
 package main
 
 const (
-	LogFormatHeader   = "\\#%s\n"
-	LogFormatChat     = "Chat: `%s` \\[`%d`\\]\n"
-	LogFormatUser     = "User: [%s](tg://user?id=%d) \\[`%d`\\]\n"
-	LogFormatUsername = "Username: @%s\n"
-	LogFormatBio	  = "Bio: `%s`\n"
-	LogFormatLanguage = "Language: `%s`\n"
-	LogFormatPremium  = "Premium: `%t`\n"
-	LogFormatData     = "Data:\n`%s`\n"
-	LogFormatAnswer   = "ID: %d\nA: %s\n"
+	LogFormatHeader    = "\\#%s\n"
+	LogFormatChat      = "Chat: `%s` \\[`%d`\\]\n"
+	LogFormatUser      = "User: [%s](tg://user?id=%d) \\[`%d`\\]\n"
+	LogFormatUsername  = "Username: @%s\n"
+	LogFormatBio       = "Bio: `%s`\n"
+	LogFormatLanguage  = "Language: `%s`\n"
+	LogFormatPremium   = "Premium: `%t`\n"
+	LogFormatIsBlocked = "IsBlocked: `%t`\n"
+	LogFormatData      = "Data:\n`%s`\n"
+	LogFormatAnswer    = "ID: %d\nA: %s\n"
 )
 
 type LogType int8

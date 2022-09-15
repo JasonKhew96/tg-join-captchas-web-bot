@@ -155,12 +155,14 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 			}
 			messages := cb.config.getMessages(userStatus.user.LanguageCode)
 			if correct {
-				if _, ok, err := cb.b.EditMessageText(messages.CorrectAnswer, &gotgbot.EditMessageTextOpts{
-					ChatId:      user.Id,
-					MessageId:   userStatus.msgId,
-					ReplyMarkup: gotgbot.InlineKeyboardMarkup{},
-				}); err != nil || !ok {
-					log.Println("failed to edit message:", ok, err)
+				if userStatus.msgId != 0 {
+					if _, ok, err := cb.b.EditMessageText(messages.CorrectAnswer, &gotgbot.EditMessageTextOpts{
+						ChatId:      user.Id,
+						MessageId:   userStatus.msgId,
+						ReplyMarkup: gotgbot.InlineKeyboardMarkup{},
+					}); err != nil || !ok {
+						log.Println("failed to edit message:", ok, err)
+					}
 				}
 				if _, err := cb.b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
 					logType: LogTypeApproved,
@@ -174,12 +176,14 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 				}
 				cb.deleteStatusAndApprove(userStatus.chat.Id, user.Id)
 			} else {
-				if _, ok, err := cb.b.EditMessageText(messages.WrongAnswer, &gotgbot.EditMessageTextOpts{
-					ChatId:      user.Id,
-					MessageId:   userStatus.msgId,
-					ReplyMarkup: gotgbot.InlineKeyboardMarkup{},
-				}); err != nil || !ok {
-					log.Println("failed to edit message:", ok, err)
+				if userStatus.msgId != 0 {
+					if _, ok, err := cb.b.EditMessageText(messages.WrongAnswer, &gotgbot.EditMessageTextOpts{
+						ChatId:      user.Id,
+						MessageId:   userStatus.msgId,
+						ReplyMarkup: gotgbot.InlineKeyboardMarkup{},
+					}); err != nil || !ok {
+						log.Println("failed to edit message:", ok, err)
+					}
 				}
 				if _, err := cb.b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
 					logType: LogTypeWrong,
