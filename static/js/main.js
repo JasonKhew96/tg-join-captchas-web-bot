@@ -28,6 +28,8 @@ let submitFunc = (ids) => {
   let body = {
     init_data: Telegram.WebApp.initData,
     answers: answers,
+    version: Telegram.WebApp.version,
+    platform: Telegram.WebApp.platform,
   };
   fetch("/api/submit", {
     method: "POST",

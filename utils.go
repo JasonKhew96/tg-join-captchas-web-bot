@@ -98,6 +98,12 @@ func buildLogString(param *BuildLogStringParam) string {
 	if param.isBlocked {
 		logString += fmt.Sprintf(LogFormatIsBlocked, param.isBlocked)
 	}
+	if param.version != "" {
+		logString += fmt.Sprintf(LogFormatVersion, param.version)
+	}
+	if param.platform != "" {
+		logString += fmt.Sprintf(LogFormatPlatform, param.platform)
+	}
 	if len(param.answers) > 0 {
 		var data string
 		for _, answer := range param.answers {

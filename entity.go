@@ -32,7 +32,9 @@ type Answer struct {
 
 type SubmitData struct {
 	CommonInitData
-	Answers []Answer `json:"answers"`
+	Answers  []Answer `json:"answers"`
+	Version  string   `json:"version"`
+	Platform string   `json:"platform"`
 }
 
 type CommonResponse struct {
@@ -67,4 +69,6 @@ type BuildLogStringParam struct {
 	userBio   string
 	isBlocked bool
 	answers   []Answer
+	version   string
+	platform  string
 }

@@ -11,6 +11,8 @@ const (
 	LogFormatIsBlocked = "IsBlocked: `%t`\n"
 	LogFormatData      = "Data:\n`%s`\n"
 	LogFormatAnswer    = "ID: %d\nA: %s\n"
+	LogFormatVersion   = "Version: `%s`\n"
+	LogFormatPlatform  = "Platform: `%s`\n"
 )
 
 type LogType int8

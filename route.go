@@ -128,7 +128,7 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println(chat.ChatId, user.Id, data.Answers)
+		log.Println(chat.ChatId, user.Id, data.Version, data.Platform, data.Answers)
 
 		if chat.ChatId == userStatus.chat.Id {
 			correct := true
@@ -165,10 +165,12 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 				if _, err := cb.b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
-					logType: LogTypeApproved,
-					chat:    userStatus.chat,
-					user:    userStatus.user,
-					answers: data.Answers,
+					logType:  LogTypeApproved,
+					chat:     userStatus.chat,
+					user:     userStatus.user,
+					answers:  data.Answers,
+					version:  data.Version,
+					platform: data.Platform,
 				}), &gotgbot.SendMessageOpts{
 					ParseMode: "MarkdownV2",
 				}); err != nil {
@@ -186,10 +188,12 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 				if _, err := cb.b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
-					logType: LogTypeWrong,
-					chat:    userStatus.chat,
-					user:    userStatus.user,
-					answers: data.Answers,
+					logType:  LogTypeWrong,
+					chat:     userStatus.chat,
+					user:     userStatus.user,
+					answers:  data.Answers,
+					version:  data.Version,
+					platform: data.Platform,
 				}), &gotgbot.SendMessageOpts{
 					ParseMode: "MarkdownV2",
 				}); err != nil {
