@@ -210,14 +210,14 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (cb *CaptchasBot) runServer(domain, port string) {
+func (cb *CaptchasBot) runServer(port string) {
 	http.HandleFunc("/api/validate", cb.validate)
 	http.HandleFunc("/api/submit", cb.submit)
 
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 
-	log.Printf("Listening on %s:%s...", domain, port)
+	log.Printf("Listening on 0.0.0.0:%s...", port)
 	go func() {
 		err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", port), nil)
 		if err != nil {

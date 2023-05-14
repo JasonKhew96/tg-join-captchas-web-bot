@@ -10,12 +10,8 @@ import (
 )
 
 func main() {
-	domain := os.Getenv("RAILWAY_STATIC_URL")
 	port := os.Getenv("PORT")
 
-	if domain == "" {
-		log.Fatal("RAILWAY_STATIC_URL is not set")
-	}
 	if port == "" {
 		log.Fatal("PORT is not set")
 	}
@@ -32,12 +28,11 @@ func main() {
 	}
 
 	cb := &CaptchasBot{
-		domain:    domain,
 		config:    config,
 		statusMap: make(map[int64]*Status),
 	}
 
-	cb.runServer(domain, port)
+	cb.runServer(port)
 
 	b, err := gotgbot.NewBot(config.BotToken, nil)
 	if err != nil {
