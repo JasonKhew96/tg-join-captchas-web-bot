@@ -69,13 +69,13 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 		log.Printf("failed to send request message: %s", err)
 	}
 
-	isGetChat := false
+	var isGetChat bool
 	bio := ctx.ChatJoinRequest.Bio
 	if bio == "" {
 		chat, err := b.GetChat(ctx.EffectiveSender.User.Id, nil)
 		if err != nil {
 			log.Printf("failed to get chat: %s", err)
-		} else {
+		} else if chat.Bio != "" {
 			bio = chat.Bio
 			isGetChat = true
 		}
