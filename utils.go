@@ -89,6 +89,9 @@ func buildLogString(param *BuildLogStringParam) string {
 	if param.userBio != "" {
 		logString += fmt.Sprintf(LogFormatBio, EscapeMarkdownV2(param.userBio))
 	}
+	if param.isGetChat {
+		logString += fmt.Sprintf(LogFormatIsGetChat, param.isGetChat)
+	}
 	if param.user.LanguageCode != "" {
 		logString += fmt.Sprintf(LogFormatLanguage, param.user.LanguageCode)
 	}

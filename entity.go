@@ -67,6 +67,7 @@ type BuildLogStringParam struct {
 	chat      *gotgbot.Chat
 	user      *gotgbot.User
 	userBio   string
+	isGetChat bool
 	isBlocked bool
 	answers   []Answer
 	version   string

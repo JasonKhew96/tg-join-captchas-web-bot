@@ -6,6 +6,7 @@ const (
 	LogFormatUser      = "user: [%s](tg://user?id=%d) \\[`%d`\\]\n"
 	LogFormatUsername  = "username: @%s\n"
 	LogFormatBio       = "bio: `%s`\n"
+	LogFormatIsGetChat = "isGetChat: `%t`\n"
 	LogFormatLanguage  = "language: `%s`\n"
 	LogFormatPremium   = "premium: `%t`\n"
 	LogFormatIsBlocked = "blocked: `%t`\n"
