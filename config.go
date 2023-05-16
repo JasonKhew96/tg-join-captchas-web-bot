@@ -33,6 +33,7 @@ type Config struct {
 	LogChatId    int64  `yaml:"log_chat_id"`
 	CustomDomain string `yaml:"custom_domain"`
 	DefaultLang  string `yaml:"default_lang"`
+	BanRegex     string `yaml:"ban_regex"`
 	Messages     map[string]Message
 	Chats        []Chat `yaml:"chats"`
 }

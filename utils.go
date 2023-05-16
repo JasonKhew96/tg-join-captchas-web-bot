@@ -80,7 +80,7 @@ func (cb *CaptchasBot) stopStatusTimer(status *Status) {
 
 func buildLogString(param *BuildLogStringParam) string {
 	var logString string
-	logString += fmt.Sprintf(LogFormatHeader, param.logType.String())
+	logString += fmt.Sprintf(LogFormatHeader, EscapeMarkdownV2(param.logType.String()))
 	logString += fmt.Sprintf(LogFormatChat, EscapeMarkdownV2(param.chat.Title), param.chat.Id)
 	logString += fmt.Sprintf(LogFormatUser, EscapeMarkdownV2(strings.Join([]string{param.user.FirstName, param.user.LastName}, " ")), param.user.Id, param.user.Id)
 	if param.user.Username != "" {

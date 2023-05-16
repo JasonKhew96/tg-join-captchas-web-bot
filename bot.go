@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -92,6 +93,33 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 		ParseMode: "MarkdownV2",
 	}); err != nil {
 		log.Println("failed to send log message:", err)
+	}
+
+	banRegex := regexp.MustCompile(cb.config.BanRegex)
+
+	matchedName := banRegex.MatchString(strings.Join([]string{ctx.EffectiveSender.User.FirstName, ctx.EffectiveSender.User.LastName}, " "))
+	matchedBio := banRegex.MatchString(bio)
+	if matchedName || matchedBio {
+		log.Println("Regex ban", ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id)
+		if _, err := b.BanChatMember(ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id, &gotgbot.BanChatMemberOpts{
+			UntilDate: time.Now().Unix(),
+		}); err != nil {
+			log.Println("failed to ban user:", err)
+		} else {
+			if _, err := b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
+				logType:   LogTypeBanRegex,
+				chat:      ctx.EffectiveChat,
+				user:      ctx.EffectiveSender.User,
+				userBio:   bio,
+				isGetChat: isGetChat,
+				isBlocked: err != nil,
+			}), &gotgbot.SendMessageOpts{
+				ParseMode: "MarkdownV2",
+			}); err != nil {
+				log.Println("failed to send log message:", err)
+			}
+		}
+		return nil
 	}
 
 	var msgId int64

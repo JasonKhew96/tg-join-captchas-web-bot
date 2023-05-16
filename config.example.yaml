@@ -4,6 +4,7 @@ timeout: 300
 log_chat_id: -1002147483647
 custom_domain: www.example.com
 default_lang: zh-hans
+ban_regex: "(114514|1919810)"
 chats:
   - chat_id: -10011111111
     questions:

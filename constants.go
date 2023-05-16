@@ -23,6 +23,7 @@ const (
 	LogTypeApproved
 	LogTypeTimeout
 	LogTypeWrong
+	LogTypeBanRegex
 )
 
 func (t LogType) String() string {
@@ -35,6 +36,8 @@ func (t LogType) String() string {
 		return "TIMEOUT"
 	case LogTypeWrong:
 		return "WRONG"
+	case LogTypeBanRegex:
+		return "BAN_REGEX"
 	default:
 		return "UNKNOWN"
 	}
