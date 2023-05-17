@@ -101,9 +101,10 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 	matchedBio := banRegex.MatchString(bio)
 	if matchedName || matchedBio {
 		log.Println("Regex ban", ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id)
-		if _, err := b.BanChatMember(ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id, &gotgbot.BanChatMemberOpts{
-			UntilDate: time.Now().Unix(),
-		}); err != nil {
+		if _, err := b.DeclineChatJoinRequest(ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id, nil); err != nil {
+			log.Println("failed to decline chat join request:", err)
+		}
+		if _, err := b.BanChatMember(ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id, nil); err != nil {
 			log.Println("failed to ban user:", err)
 		} else {
 			if _, err := b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
