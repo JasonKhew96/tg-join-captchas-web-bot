@@ -30,15 +30,17 @@ func (cb *CaptchasBot) timeoutKick(msgId int64, chat *gotgbot.Chat, user *gotgbo
 			}
 		}
 
-		if _, err := cb.b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
-			logType: LogTypeTimeout,
-			chat:    chat,
-			user:    user,
-		}), &gotgbot.SendMessageOpts{
-			ParseMode: "MarkdownV2",
-		}); err != nil {
-			log.Println("failed to send log message:", err)
+		cb.loggingChannel <- MessageObject{
+			text: buildLogString(&BuildLogStringParam{
+				logType: LogTypeTimeout,
+				chat:    chat,
+				user:    user,
+			}),
+			sendMessageOpts: &gotgbot.SendMessageOpts{
+				ParseMode: "MarkdownV2",
+			},
 		}
+
 		cb.deleteStatusAndDecline(chat.Id, user.Id, false)
 	}
 }
@@ -82,17 +84,18 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 		}
 	}
 
-	if _, err := b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
-		logType:   LogTypeRequested,
-		chat:      ctx.EffectiveChat,
-		user:      ctx.EffectiveSender.User,
-		userBio:   bio,
-		isGetChat: isGetChat,
-		isBlocked: err != nil,
-	}), &gotgbot.SendMessageOpts{
-		ParseMode: "MarkdownV2",
-	}); err != nil {
-		log.Println("failed to send log message:", err)
+	cb.loggingChannel <- MessageObject{
+		text: buildLogString(&BuildLogStringParam{
+			logType:   LogTypeRequested,
+			chat:      ctx.EffectiveChat,
+			user:      ctx.EffectiveSender.User,
+			userBio:   bio,
+			isGetChat: isGetChat,
+			isBlocked: err != nil,
+		}),
+		sendMessageOpts: &gotgbot.SendMessageOpts{
+			ParseMode: "MarkdownV2",
+		},
 	}
 
 	banRegex := regexp.MustCompile(cb.config.BanRegex)
@@ -107,17 +110,18 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 		if _, err := b.BanChatMember(ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id, nil); err != nil {
 			log.Println("failed to ban user:", err)
 		} else {
-			if _, err := b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
-				logType:   LogTypeBanRegex,
-				chat:      ctx.EffectiveChat,
-				user:      ctx.EffectiveSender.User,
-				userBio:   bio,
-				isGetChat: isGetChat,
-				isBlocked: err != nil,
-			}), &gotgbot.SendMessageOpts{
-				ParseMode: "MarkdownV2",
-			}); err != nil {
-				log.Println("failed to send log message:", err)
+			cb.loggingChannel <- MessageObject{
+				text: buildLogString(&BuildLogStringParam{
+					logType:   LogTypeBanRegex,
+					chat:      ctx.EffectiveChat,
+					user:      ctx.EffectiveSender.User,
+					userBio:   bio,
+					isGetChat: isGetChat,
+					isBlocked: err != nil,
+				}),
+				sendMessageOpts: &gotgbot.SendMessageOpts{
+					ParseMode: "MarkdownV2",
+				},
 			}
 		}
 		return nil

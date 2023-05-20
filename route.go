@@ -164,18 +164,21 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 						log.Println("failed to edit message:", ok, err)
 					}
 				}
-				if _, err := cb.b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
-					logType:  LogTypeApproved,
-					chat:     userStatus.chat,
-					user:     userStatus.user,
-					answers:  data.Answers,
-					version:  data.Version,
-					platform: data.Platform,
-				}), &gotgbot.SendMessageOpts{
-					ParseMode: "MarkdownV2",
-				}); err != nil {
-					log.Println("failed to send log message:", err)
+
+				cb.loggingChannel <- MessageObject{
+					text: buildLogString(&BuildLogStringParam{
+						logType:  LogTypeApproved,
+						chat:     userStatus.chat,
+						user:     userStatus.user,
+						answers:  data.Answers,
+						version:  data.Version,
+						platform: data.Platform,
+					}),
+					sendMessageOpts: &gotgbot.SendMessageOpts{
+						ParseMode: "MarkdownV2",
+					},
 				}
+
 				cb.deleteStatusAndApprove(userStatus.chat.Id, user.Id)
 			} else {
 				if userStatus.msgId != 0 {

@@ -28,8 +28,9 @@ func main() {
 	}
 
 	cb := &CaptchasBot{
-		config:    config,
-		statusMap: make(map[int64]*Status),
+		config:         config,
+		statusMap:      make(map[int64]*Status),
+		loggingChannel: make(chan MessageObject),
 	}
 
 	cb.runServer(port)
@@ -43,6 +44,8 @@ func main() {
 
 	updater := ext.NewUpdater(nil)
 	dispatcher := updater.Dispatcher
+
+	go cb.telegramWorker(config.LogChatId, cb.loggingChannel)
 
 	dispatcher.AddHandler(handlers.NewChatJoinRequest(cb.isValidChat, cb.handleChatJoinRequest))
 	dispatcher.AddHandler(handlers.NewCommand("ping", cb.commandPing))
