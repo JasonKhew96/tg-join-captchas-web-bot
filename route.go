@@ -1,6 +1,9 @@
 package main
 
 import (
+	"crypto/md5"
+	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strconv"
+	"time"
 
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
@@ -135,12 +140,46 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 			for _, userAnswer := range data.Answers {
 				for _, q := range chat.Questions {
 					if userAnswer.Id == q.Id {
-						re, err := regexp.Compile(q.Answer)
-						if err != nil {
-							log.Fatal(err)
-						}
-						if !re.MatchString(userAnswer.Answer) && correct {
+						if q.Type == "text" {
+							re, err := regexp.Compile(q.Answer)
+							if err != nil {
+								log.Fatal(err)
+							}
+							if !re.MatchString(userAnswer.Answer) && correct {
+								correct = false
+								break
+							}
+						} else if q.Type == "hash" {
+							decoded, err := base64.StdEncoding.DecodeString(userAnswer.Answer)
+							if err != nil {
+								correct = false
+								break
+							}
+							newDecoded := string(decoded)
+							if len(newDecoded) != 42 { // md5 32 + ts 10
+								correct = false
+								break
+							}
+							userHash := newDecoded[:32]
+							userTimestampStr := newDecoded[32:]
+							userTimestamp, err := strconv.ParseInt(userTimestampStr, 10, 64)
+							if err != nil {
+								correct = false
+								break
+							}
+							if time.Now().Unix()-userTimestamp > 300 {
+								correct = false
+								break
+							}
+							expectedHashByte := md5.Sum([]byte(q.Answer + strconv.FormatInt(userTimestamp, 10)))
+							expectedHash := hex.EncodeToString(expectedHashByte[:])
+							if userHash != expectedHash {
+								correct = false
+								break
+							}
+						} else {
 							correct = false
+							break
 						}
 					}
 				}

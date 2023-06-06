@@ -52,6 +52,9 @@ func main() {
 
 	err = updater.StartPolling(b, &ext.PollingOpts{
 		DropPendingUpdates: false,
+		GetUpdatesOpts: gotgbot.GetUpdatesOpts{
+			AllowedUpdates: []string{"message", "callback_query", "chat_join_request"},
+		},
 	})
 	if err != nil {
 		log.Fatal("failed to start polling: " + err.Error())
