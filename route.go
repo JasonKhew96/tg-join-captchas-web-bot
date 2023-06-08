@@ -150,6 +150,10 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 								break
 							}
 						} else if q.Type == "hash" {
+							if len(data.Answers[i].Answer) == 0 {
+								correct = false
+								break
+							}
 							decoded, err := base64.StdEncoding.DecodeString(data.Answers[i].Answer)
 							if err != nil {
 								correct = false
