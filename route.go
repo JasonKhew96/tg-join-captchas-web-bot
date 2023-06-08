@@ -137,20 +137,20 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 
 		if chat.ChatId == userStatus.chat.Id {
 			correct := true
-			for _, userAnswer := range data.Answers {
+			for i := range data.Answers {
 				for _, q := range chat.Questions {
-					if userAnswer.Id == q.Id {
+					if data.Answers[i].Id == q.Id {
 						if q.Type == "text" {
 							re, err := regexp.Compile(q.Answer)
 							if err != nil {
 								log.Fatal(err)
 							}
-							if !re.MatchString(userAnswer.Answer) && correct {
+							if !re.MatchString(data.Answers[i].Answer) && correct {
 								correct = false
 								break
 							}
 						} else if q.Type == "hash" {
-							decoded, err := base64.StdEncoding.DecodeString(userAnswer.Answer)
+							decoded, err := base64.StdEncoding.DecodeString(data.Answers[i].Answer)
 							if err != nil {
 								correct = false
 								break
