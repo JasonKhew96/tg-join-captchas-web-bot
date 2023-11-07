@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"regexp"
 	"strings"
 	"time"
 
@@ -98,10 +97,19 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 		},
 	}
 
-	banRegex := regexp.MustCompile(cb.config.BanRegex)
-
-	matchedName := banRegex.MatchString(strings.Join([]string{ctx.EffectiveSender.User.FirstName, ctx.EffectiveSender.User.LastName}, " "))
-	matchedBio := banRegex.MatchString(bio)
+	name := strings.Join([]string{ctx.EffectiveSender.User.FirstName, ctx.EffectiveSender.User.LastName}, " ")
+	newName, err := cb.t2s.Convert(strings.Join([]string{ctx.EffectiveSender.User.FirstName, ctx.EffectiveSender.User.LastName}, " "))
+	if err != nil {
+		log.Println("failed to convert name:", err)
+		newName = name
+	}
+	matchedName := cb.banRegex.MatchString(newName)
+	newBio, err := cb.t2s.Convert(bio)
+	if err != nil {
+		log.Println("failed to convert bio:", err)
+		newBio = bio
+	}
+	matchedBio := cb.banRegex.MatchString(newBio)
 	if matchedName || matchedBio {
 		log.Println("Regex ban", ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id)
 		if _, err := b.DeclineChatJoinRequest(ctx.EffectiveChat.Id, ctx.EffectiveSender.User.Id, nil); err != nil {

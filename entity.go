@@ -1,9 +1,11 @@
 package main
 
 import (
+	"regexp"
 	"time"
 
 	"github.com/PaulSonOfLars/gotgbot/v2"
+	"github.com/liuzl/gocc"
 )
 
 type Status struct {
@@ -19,6 +21,8 @@ type CaptchasBot struct {
 	b              *gotgbot.Bot
 	statusMap      map[int64]*Status
 	loggingChannel chan MessageObject
+	banRegex       *regexp.Regexp
+	t2s            *gocc.OpenCC
 }
 
 type CommonInitData struct {

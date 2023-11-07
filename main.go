@@ -3,11 +3,13 @@ package main
 import (
 	"log"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext/handlers"
+	"github.com/liuzl/gocc"
 )
 
 func main() {
@@ -28,10 +30,19 @@ func main() {
 		return
 	}
 
+	banRegex := regexp.MustCompile(config.BanRegex)
+	t2s, err := gocc.New("t2s")
+	if err != nil {
+		log.Fatal("failed to init t2s: ", err.Error())
+		return
+	}
+
 	cb := &CaptchasBot{
 		config:         config,
 		statusMap:      make(map[int64]*Status),
 		loggingChannel: make(chan MessageObject),
+		banRegex:       banRegex,
+		t2s:            t2s,
 	}
 
 	cb.runServer(port)

@@ -1,5 +1,13 @@
 github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.22 h1:IWnsvf0mmpu8gBRB8Q6JejWcgDLC1W+M6aFRxrI+cgU=
 github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.22/go.mod h1:kL1v4iIjlalwm3gCYGvF4NLa3hs+aKEfRkNJvj4aoDU=
+github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d h1:ir/IFJU5xbja5UaBEQLjcvn7aAU01nqU/NUyOBEU+ew=
+github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d/go.mod h1:PRWNwWq0yifz6XDPZu48aSld8BWwBfr2JKB2bGWiEd4=
+github.com/liuzl/cedar-go v0.0.0-20170805034717-80a9c64b256d h1:qSmEGTgjkESUX5kPMSGJ4pcBUtYVDdkNzMrjQyvRvp0=
+github.com/liuzl/cedar-go v0.0.0-20170805034717-80a9c64b256d/go.mod h1:x7SghIWwLVcJObXbjK7S2ENsT1cAcdJcPl7dRaSFog0=
+github.com/liuzl/da v0.0.0-20180704015230-14771aad5b1d h1:hTRDIpJ1FjS9ULJuEzu69n3qTgc18eI+ztw/pJv47hs=
+github.com/liuzl/da v0.0.0-20180704015230-14771aad5b1d/go.mod h1:7xD3p0XnHvJFQ3t/stEJd877CSIMkH/fACVWen5pYnc=
+github.com/liuzl/gocc v0.0.0-20230104115651-c793537006ac h1:BTuOtjHryOwF2nzm2/H+SrBKEeB2lMwqSuAwwPcfJWk=
+github.com/liuzl/gocc v0.0.0-20230104115651-c793537006ac/go.mod h1:7KaV9YIR92M1FpbczAcfYQ3UZ5ayT27pNtunDmXvLBo=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
