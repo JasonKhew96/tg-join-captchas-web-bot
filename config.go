@@ -28,6 +28,7 @@ type Message struct {
 
 type Config struct {
 	BotToken     string `yaml:"bot_token"`
+	BotApiUrl    string `yaml:"bot_api_url"`
 	BanTime      int64  `yaml:"ban_time"`
 	Timeout      int64  `yaml:"timeout"`
 	LogChatId    int64  `yaml:"log_chat_id"`

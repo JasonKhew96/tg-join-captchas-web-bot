@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
@@ -35,7 +36,16 @@ func main() {
 
 	cb.runServer(port)
 
-	b, err := gotgbot.NewBot(config.BotToken, nil)
+	b, err := gotgbot.NewBot(config.BotToken, &gotgbot.BotOpts{
+		RequestOpts: &gotgbot.RequestOpts{
+			Timeout: time.Minute,
+			APIURL:  config.BotApiUrl,
+		},
+		DefaultRequestOpts: &gotgbot.RequestOpts{
+			Timeout: time.Minute,
+			APIURL:  config.BotApiUrl,
+		},
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,6 +64,11 @@ func main() {
 		DropPendingUpdates: false,
 		GetUpdatesOpts: gotgbot.GetUpdatesOpts{
 			AllowedUpdates: []string{"message", "callback_query", "chat_join_request"},
+			Timeout:        60,
+			RequestOpts: &gotgbot.RequestOpts{
+				Timeout: time.Minute,
+				APIURL:  config.BotApiUrl,
+			},
 		},
 	})
 	if err != nil {
