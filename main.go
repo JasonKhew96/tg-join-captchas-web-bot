@@ -41,10 +41,6 @@ func main() {
 			Timeout: time.Minute,
 			APIURL:  config.BotApiUrl,
 		},
-		DefaultRequestOpts: &gotgbot.RequestOpts{
-			Timeout: time.Minute,
-			APIURL:  config.BotApiUrl,
-		},
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -62,7 +58,7 @@ func main() {
 
 	err = updater.StartPolling(b, &ext.PollingOpts{
 		DropPendingUpdates: false,
-		GetUpdatesOpts: gotgbot.GetUpdatesOpts{
+		GetUpdatesOpts: &gotgbot.GetUpdatesOpts{
 			AllowedUpdates: []string{"message", "callback_query", "chat_join_request"},
 			Timeout:        60,
 			RequestOpts: &gotgbot.RequestOpts{
