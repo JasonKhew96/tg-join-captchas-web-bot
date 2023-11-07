@@ -15,7 +15,6 @@ type Status struct {
 }
 
 type CaptchasBot struct {
-	domain         string
 	config         *Config
 	b              *gotgbot.Bot
 	statusMap      map[int64]*Status
