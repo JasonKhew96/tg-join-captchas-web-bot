@@ -2,7 +2,7 @@ module github.com/JasonKhew96/tg-join-captchas-web-bot
 
 go 1.20
 
-require github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.22
+require github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.23
 
 require (
 	github.com/liuzl/gocc v0.0.0-20230104115651-c793537006ac

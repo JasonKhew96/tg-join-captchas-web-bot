@@ -59,8 +59,8 @@ func main() {
 
 	cb.b = b
 
-	updater := ext.NewUpdater(nil)
-	dispatcher := updater.Dispatcher
+	dispatcher := ext.NewDispatcher(nil)
+	updater := ext.NewUpdater(dispatcher, nil)
 
 	go cb.telegramWorker(config.LogChatId, cb.loggingChannel)
 
