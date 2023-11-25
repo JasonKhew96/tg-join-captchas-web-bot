@@ -85,12 +85,13 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 
 	cb.loggingChannel <- MessageObject{
 		text: buildLogString(&BuildLogStringParam{
-			logType:   LogTypeRequested,
-			chat:      ctx.EffectiveChat,
-			user:      ctx.EffectiveSender.User,
-			userBio:   bio,
-			isGetChat: isGetChat,
-			isBlocked: err != nil,
+			logType:     LogTypeRequested,
+			chat:        ctx.EffectiveChat,
+			user:        ctx.EffectiveSender.User,
+			userBio:     bio,
+			isGetChat:   isGetChat,
+			isBlocked:   err != nil,
+			startTimeMs: ctx.ChatJoinRequest.Date * 1e3,
 		}),
 		sendMessageOpts: &gotgbot.SendMessageOpts{
 			ParseMode: "MarkdownV2",
@@ -141,11 +142,11 @@ func (cb *CaptchasBot) handleChatJoinRequest(b *gotgbot.Bot, ctx *ext.Context) e
 	}
 
 	cb.statusMap[ctx.EffectiveSender.User.Id] = &Status{
-		chat:      ctx.EffectiveChat,
-		user:      ctx.EffectiveSender.User,
-		msgId:     msgId,
-		startTime: time.Now().Unix(),
-		timer:     time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutKick(msgId, ctx.EffectiveChat, ctx.EffectiveSender.User)),
+		chat:        ctx.EffectiveChat,
+		user:        ctx.EffectiveSender.User,
+		msgId:       msgId,
+		startTimeMs: time.Now().UnixMilli(),
+		timer:       time.AfterFunc(time.Duration(cb.config.Timeout)*time.Second, cb.timeoutKick(msgId, ctx.EffectiveChat, ctx.EffectiveSender.User)),
 	}
 	return nil
 }

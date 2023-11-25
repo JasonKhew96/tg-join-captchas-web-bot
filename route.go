@@ -16,6 +16,7 @@ import (
 
 	"github.com/PaulSonOfLars/gotgbot/v2"
 	"github.com/PaulSonOfLars/gotgbot/v2/ext"
+	"github.com/tomasen/realip"
 )
 
 func (cb *CaptchasBot) validate(w http.ResponseWriter, r *http.Request) {
@@ -56,6 +57,27 @@ func (cb *CaptchasBot) validate(w http.ResponseWriter, r *http.Request) {
 		if !isExists {
 			writeJson(w, false, "validation failed")
 			return
+		}
+
+		if userStatus.validateTimeMs <= 0 {
+			ip := realip.FromRequest(r)
+			userStatus.ip = ip
+			userStatus.userAgent = r.UserAgent()
+			userStatus.validateTimeMs = time.Now().UnixMilli()
+			cb.loggingChannel <- MessageObject{
+				text: buildLogString(&BuildLogStringParam{
+					logType:        LogTypeValidate,
+					chat:           userStatus.chat,
+					user:           userStatus.user,
+					startTimeMs:    userStatus.startTimeMs,
+					validateTimeMs: userStatus.validateTimeMs,
+					ip:             ip,
+					userAgent:      userStatus.userAgent,
+				}),
+				sendMessageOpts: &gotgbot.SendMessageOpts{
+					ParseMode: "MarkdownV2",
+				},
+			}
 		}
 
 		chat := cb.getChatConfig(userStatus.chat.Id)
@@ -171,7 +193,7 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 								correct = false
 								break
 							}
-							if time.Now().Unix()-userTimestamp > 300 {
+							if time.Now().UnixMilli()-(userTimestamp*1e3) > 300000 {
 								correct = false
 								break
 							}
@@ -210,12 +232,17 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 
 				cb.loggingChannel <- MessageObject{
 					text: buildLogString(&BuildLogStringParam{
-						logType:  LogTypeApproved,
-						chat:     userStatus.chat,
-						user:     userStatus.user,
-						answers:  data.Answers,
-						version:  data.Version,
-						platform: data.Platform,
+						logType:        LogTypeApproved,
+						chat:           userStatus.chat,
+						user:           userStatus.user,
+						answers:        data.Answers,
+						version:        data.Version,
+						platform:       data.Platform,
+						startTimeMs:    userStatus.startTimeMs,
+						validateTimeMs: userStatus.validateTimeMs,
+						submitTimeMs:   time.Now().UnixMilli(),
+						ip:             userStatus.ip,
+						userAgent:      userStatus.userAgent,
 					}),
 					sendMessageOpts: &gotgbot.SendMessageOpts{
 						ParseMode: "MarkdownV2",
@@ -234,12 +261,17 @@ func (cb *CaptchasBot) submit(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 				if _, err := cb.b.SendMessage(cb.config.LogChatId, buildLogString(&BuildLogStringParam{
-					logType:  LogTypeWrong,
-					chat:     userStatus.chat,
-					user:     userStatus.user,
-					answers:  data.Answers,
-					version:  data.Version,
-					platform: data.Platform,
+					logType:        LogTypeWrong,
+					chat:           userStatus.chat,
+					user:           userStatus.user,
+					answers:        data.Answers,
+					version:        data.Version,
+					platform:       data.Platform,
+					startTimeMs:    userStatus.startTimeMs,
+					validateTimeMs: userStatus.validateTimeMs,
+					submitTimeMs:   time.Now().UnixMilli(),
+					ip:             userStatus.ip,
+					userAgent:      userStatus.userAgent,
 				}), &gotgbot.SendMessageOpts{
 					ParseMode: "MarkdownV2",
 				}); err != nil {

@@ -9,11 +9,14 @@ import (
 )
 
 type Status struct {
-	chat      *gotgbot.Chat
-	user      *gotgbot.User
-	msgId     int64
-	startTime int64
-	timer     *time.Timer
+	chat           *gotgbot.Chat
+	user           *gotgbot.User
+	msgId          int64
+	startTimeMs    int64
+	validateTimeMs int64
+	timer          *time.Timer
+	ip             string
+	userAgent      string
 }
 
 type CaptchasBot struct {
@@ -67,13 +70,18 @@ type User struct {
 }
 
 type BuildLogStringParam struct {
-	logType   LogType
-	chat      *gotgbot.Chat
-	user      *gotgbot.User
-	userBio   string
-	isGetChat bool
-	isBlocked bool
-	answers   []Answer
-	version   string
-	platform  string
+	logType        LogType
+	chat           *gotgbot.Chat
+	user           *gotgbot.User
+	userBio        string
+	isGetChat      bool
+	isBlocked      bool
+	answers        []Answer
+	version        string
+	platform       string
+	startTimeMs    int64
+	validateTimeMs int64
+	submitTimeMs   int64
+	ip             string
+	userAgent      string
 }

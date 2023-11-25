@@ -6,6 +6,7 @@ require github.com/PaulSonOfLars/gotgbot/v2 v2.0.0-rc.22
 
 require (
 	github.com/liuzl/gocc v0.0.0-20230104115651-c793537006ac
+	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
 	gopkg.in/yaml.v3 v3.0.1
 )
 

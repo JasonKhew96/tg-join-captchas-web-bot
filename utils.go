@@ -48,7 +48,7 @@ func (cb *CaptchasBot) deleteStatusAndDecline(chatId, userId int64, needBan bool
 		}
 		if needBan {
 			if _, err := cb.b.BanChatMember(chatId, userId, &gotgbot.BanChatMemberOpts{
-				UntilDate: time.Now().Unix() + cb.config.BanTime,
+				UntilDate: time.Now().UnixMilli() + (cb.config.BanTime * 1e3),
 			}); err != nil {
 				log.Println("failed to ban user:", err)
 			}
@@ -106,6 +106,20 @@ func buildLogString(param *BuildLogStringParam) string {
 	}
 	if param.platform != "" {
 		logString += fmt.Sprintf(LogFormatPlatform, param.platform)
+	}
+	if param.submitTimeMs > 0 {
+		logString += fmt.Sprintf(LogFormatValidateElapsed, param.validateTimeMs-param.startTimeMs)
+		logString += fmt.Sprintf(LogFormatSubmitElapsed, param.submitTimeMs-param.validateTimeMs)
+	} else if param.validateTimeMs > 0 {
+		logString += fmt.Sprintf(LogFormatValidateElapsed, param.validateTimeMs-param.startTimeMs)
+	} else if param.startTimeMs > 0 {
+		logString += fmt.Sprintf(LogFormatStartTime, param.startTimeMs)
+	}
+	if param.ip != "" {
+		logString += fmt.Sprintf(LogFormatIp, EscapeMarkdownV2(param.ip))
+	}
+	if param.userAgent != "" {
+		logString += fmt.Sprintf(LogFormatUserAgent, EscapeMarkdownV2(param.userAgent))
 	}
 	if len(param.answers) > 0 {
 		var data string
