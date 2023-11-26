@@ -48,7 +48,7 @@ func (cb *CaptchasBot) deleteStatusAndDecline(chatId, userId int64, needBan bool
 		}
 		if needBan {
 			if _, err := cb.b.BanChatMember(chatId, userId, &gotgbot.BanChatMemberOpts{
-				UntilDate: time.Now().UnixMilli() + (cb.config.BanTime * 1e3),
+				UntilDate: time.Now().Unix() + cb.config.BanTime,
 			}); err != nil {
 				log.Println("failed to ban user:", err)
 			}
