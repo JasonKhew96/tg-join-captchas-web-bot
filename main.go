@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"regexp"
 	"time"
@@ -48,6 +49,15 @@ func main() {
 	cb.runServer(port)
 
 	b, err := gotgbot.NewBot(config.BotToken, &gotgbot.BotOpts{
+		BotClient: &gotgbot.BaseBotClient{
+			Client: http.Client{
+				Timeout: time.Minute,
+			},
+			DefaultRequestOpts: &gotgbot.RequestOpts{
+				Timeout: time.Minute,
+				APIURL:  config.BotApiUrl,
+			},
+		},
 		RequestOpts: &gotgbot.RequestOpts{
 			Timeout: time.Minute,
 			APIURL:  config.BotApiUrl,
@@ -72,10 +82,6 @@ func main() {
 		GetUpdatesOpts: &gotgbot.GetUpdatesOpts{
 			AllowedUpdates: []string{"message", "callback_query", "chat_join_request"},
 			Timeout:        60,
-			RequestOpts: &gotgbot.RequestOpts{
-				Timeout: time.Minute,
-				APIURL:  config.BotApiUrl,
-			},
 		},
 	})
 	if err != nil {
